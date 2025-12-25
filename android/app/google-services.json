@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "902909183308",
+    "project_id": "brookingapp",
+    "storage_bucket": "brookingapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:902909183308:android:1728f314efe28151d8bbe9",
+        "android_client_info": {
+          "package_name": "com.mahmoud.project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "902909183308-61lb3peb2nne1nrfgv5ohvk2enc1322v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mahmoud.project",
+            "certificate_hash": "e98788c6ed62d6f269e5484cb3a94e65190cf1b7"
+          }
+        },
+        {
+          "client_id": "902909183308-qjuvppcoe6ch5k338996udp7sitbsvtn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGt_zqa8UToESFsa05NZN3ip4v4U64mSc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "902909183308-qjuvppcoe6ch5k338996udp7sitbsvtn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+   
+  ],
+  "configuration_version": "1"
+  
+}
