@@ -18,7 +18,17 @@ class DoctorProfilePage extends StatelessWidget {
             const SizedBox(height: 20),
             Text('الاسم: ${doctor['name'] ?? 'غير متوفر'}', style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 10),
-            Text('التخصص: ${doctor['specialization'] ?? 'عام'}', style: const TextStyle(fontSize: 16)),
+            Text('التخصص: ${doctor['specialty'] ?? 'عام'}', style: const TextStyle(fontSize: 16)),
+            const SizedBox(height: 10),
+            Text('مكان العمل: ${doctor['workplaceType'] ?? 'عيادة'}', style: const TextStyle(fontSize: 16)),
+            const SizedBox(height: 10),
+            Text('المحافظة: ${doctor['governorate'] ?? 'غير محدد'}', style: const TextStyle(fontSize: 16)),
+            const SizedBox(height: 10),
+            Text('العنوان: ${doctor['address'] ?? 'غير محدد'}', style: const TextStyle(fontSize: 16)),
+            const SizedBox(height: 10),
+            Text('سعر الكشف: ${doctor['price'] ?? 'غير محدد'}', style: const TextStyle(fontSize: 16)),
+            const SizedBox(height: 10),
+            Text('نبذة: ${doctor['bio'] ?? ''}', style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 30),
             Center(
               child: ElevatedButton(

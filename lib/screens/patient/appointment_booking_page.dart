@@ -27,6 +27,14 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     setState(() => _isBooking = true);
     try {
       final user = FirebaseAuth.instance.currentUser;
+      String patientName = 'مريض';
+      if (user != null) {
+        final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+           patientName = userDoc.data()?['name'] ?? 'مريض';
+        }
+      }
+
       final dateTime = DateTime(
         _selectedDate!.year,
         _selectedDate!.month,
@@ -39,6 +47,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
         'doctorId': widget.doctor['uid'] ?? '',
         'doctorName': widget.doctor['name'] ?? 'طبيب',
         'patientId': user?.uid,
+        'patientName': patientName,
         'patientEmail': user?.email,
         'date': dateTime.toIso8601String(),
         'description': _descriptionController.text.trim(),
@@ -77,11 +86,21 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
             if (widget.doctor['price'] != null)
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
-                child: Text('سعر الكشف: ${widget.doctor['price']}',
-                    style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.green,
-                        fontWeight: FontWeight.bold)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('سعر الكشف: ${widget.doctor['price']}',
+                        style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    Text('المكان: ${widget.doctor['workplaceType'] ?? 'عيادة'}',
+                        style: const TextStyle(fontSize: 14)),
+                    Text('العنوان: ${widget.doctor['governorate'] ?? ''} - ${widget.doctor['address'] ?? ''}',
+                        style: const TextStyle(fontSize: 14)),
+                  ],
+                ),
               ),
               
             if (widget.doctor['bio'] != null && widget.doctor['bio'].isNotEmpty)

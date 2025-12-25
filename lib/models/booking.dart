@@ -5,6 +5,7 @@ class Booking {
   final String doctorId;
   final String doctorName;
   final String patientId;
+  final String? patientName;
   final String? patientEmail;
   final Timestamp date;        // 📅 موعد الحجز
   final String status;
@@ -15,6 +16,7 @@ class Booking {
     required this.doctorId,
     required this.doctorName,
     required this.patientId,
+    this.patientName,
     this.patientEmail,
     required this.date,
     this.status = 'pending',
@@ -29,6 +31,7 @@ class Booking {
       doctorId: map['doctorId'] ?? '',
       doctorName: map['doctorName'] ?? '',
       patientId: map['patientId'] ?? '',
+      patientName: map['patientName'],
       patientEmail: map['patientEmail'],
       date: map['date'] as Timestamp,
       status: map['status'] ?? 'pending',
@@ -42,6 +45,7 @@ class Booking {
       'doctorId': doctorId,
       'doctorName': doctorName,
       'patientId': patientId,
+      'patientName': patientName,
       'patientEmail': patientEmail,
       'date': date,
       'status': status,

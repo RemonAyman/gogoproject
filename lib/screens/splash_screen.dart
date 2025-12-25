@@ -74,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             const SizedBox(height: 10),
             Text(
-              'Rعاية طبية متكاملة',
+              'عيادة طبية متكاملة',
               style: TextStyle(
                 fontSize: 18,
                 color: Colors.white.withOpacity(0.9),

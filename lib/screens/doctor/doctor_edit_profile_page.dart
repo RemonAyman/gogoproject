@@ -17,6 +17,9 @@ class _DoctorEditProfilePageState extends State<DoctorEditProfilePage> {
   final _specialtyController = TextEditingController();
   final _priceController = TextEditingController();
   final _bioController = TextEditingController();
+  final _governorateController = TextEditingController();
+  final _addressController = TextEditingController();
+  String _workplaceType = 'عيادة'; // Default value
   bool _isLoading = false;
 
   @override
@@ -35,6 +38,11 @@ class _DoctorEditProfilePageState extends State<DoctorEditProfilePage> {
         _specialtyController.text = data['specialty'] ?? '';
         _priceController.text = data['price'] ?? '';
         _bioController.text = data['bio'] ?? '';
+        _governorateController.text = data['governorate'] ?? '';
+        _addressController.text = data['address'] ?? '';
+        if (data['workplaceType'] != null) {
+          setState(() => _workplaceType = data['workplaceType']);
+        }
       }
     }
   }
@@ -51,6 +59,9 @@ class _DoctorEditProfilePageState extends State<DoctorEditProfilePage> {
           'specialty': _specialtyController.text.trim(),
           'price': _priceController.text.trim(),
           'bio': _bioController.text.trim(),
+          'governorate': _governorateController.text.trim(),
+          'address': _addressController.text.trim(),
+          'workplaceType': _workplaceType,
           'profileCompleted': true,
         }, SetOptions(merge: true));
 
@@ -101,6 +112,34 @@ class _DoctorEditProfilePageState extends State<DoctorEditProfilePage> {
               TextFormField(
                 controller: _priceController,
                 decoration: const InputDecoration(labelText: 'سعر الكشف (مثال: 300 EGP)'),
+                validator: (v) => v!.isEmpty ? 'مطلوب' : null,
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: _workplaceType,
+                decoration: const InputDecoration(labelText: 'مكان العمل'),
+                items: ['عيادة', 'مستشفى'].map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (newValue) {
+                  setState(() {
+                    _workplaceType = newValue!;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _governorateController,
+                decoration: const InputDecoration(labelText: 'المحافظة'),
+                validator: (v) => v!.isEmpty ? 'مطلوب' : null,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _addressController,
+                decoration: const InputDecoration(labelText: 'العنوان بالتفصيل'),
                 validator: (v) => v!.isEmpty ? 'مطلوب' : null,
               ),
               const SizedBox(height: 16),

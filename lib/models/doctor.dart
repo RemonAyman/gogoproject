@@ -4,6 +4,9 @@ class Doctor {
   final String specialty;
   final String bio;
   final String price;
+  final String workplaceType;
+  final String governorate;
+  final String address;
   final Map<String, List<String>> bookings; // key: yyyy-m-d
 
   Doctor({
@@ -12,6 +15,9 @@ class Doctor {
     required this.specialty,
     String? bio,
     required this.price,
+    this.workplaceType = 'Clinic',
+    this.governorate = '',
+    this.address = '',
     Map<String, List<String>>? bookings,
   })  : bio = bio ?? '',
         bookings = bookings ?? {};

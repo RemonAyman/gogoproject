@@ -60,7 +60,7 @@ class DashboardPage extends StatelessWidget {
               return Card(
                 child: ListTile(
                   leading: const Icon(Icons.person),
-                  title: Text(data['patientEmail'] ?? 'مريض'),
+                  title: Text(data['patientName'] ?? data['patientEmail'] ?? 'مريض'),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
