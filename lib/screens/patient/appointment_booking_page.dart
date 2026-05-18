@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import '../../services/api_service.dart';
 
 class AppointmentBookingPage extends StatefulWidget {
   final dynamic doctor;
@@ -26,15 +25,6 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
 
     setState(() => _isBooking = true);
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      String patientName = 'مريض';
-      if (user != null) {
-        final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-        if (userDoc.exists) {
-           patientName = userDoc.data()?['name'] ?? 'مريض';
-        }
-      }
-
       final dateTime = DateTime(
         _selectedDate!.year,
         _selectedDate!.month,
@@ -43,18 +33,13 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
         _selectedTime!.minute,
       );
 
-      await FirebaseFirestore.instance.collection('appointments').add({
-        'doctorId': widget.doctor['uid'] ?? '',
-        'doctorName': widget.doctor['name'] ?? 'طبيب',
-        'patientId': user?.uid,
-        'patientName': patientName,
-        'patientEmail': user?.email,
-        'date': dateTime.toIso8601String(),
-        'description': _descriptionController.text.trim(),
-        'price': widget.doctor['price'] ?? '',
-        'status': 'pending',
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+      await ApiService().createBooking(
+        doctorId: widget.doctor['id'] ?? widget.doctor['_id'] ?? '',
+        doctorName: widget.doctor['name'] ?? 'طبيب',
+        date: dateTime.toIso8601String(),
+        description: _descriptionController.text.trim(),
+        price: widget.doctor['price'] ?? '',
+      );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -65,7 +50,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل الحجز: $e')),
+          SnackBar(content: Text('فشل الحجز: ${e.toString().replaceAll('Exception: ', '')}')),
         );
       }
     } finally {

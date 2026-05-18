@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import '../../services/api_service.dart';
 
 class PatientProfilePage extends StatefulWidget {
   const PatientProfilePage({super.key});
@@ -10,6 +9,7 @@ class PatientProfilePage extends StatefulWidget {
 }
 
 class _PatientProfilePageState extends State<PatientProfilePage> {
+  final ApiService _apiService = ApiService();
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _ageController = TextEditingController();
@@ -24,18 +24,16 @@ class _PatientProfilePageState extends State<PatientProfilePage> {
   }
 
   Future<void> _loadUserData() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-      if (doc.exists) {
-        final data = doc.data() as Map<String, dynamic>;
-        setState(() {
-          _nameController.text = data['name'] ?? '';
-          _ageController.text = data['age'] ?? '';
-          _painLocationController.text = data['painLocation'] ?? '';
-          _descriptionController.text = data['description'] ?? '';
-        });
-      }
+    try {
+      final data = await _apiService.getMe();
+      setState(() {
+        _nameController.text = data['name'] ?? '';
+        _ageController.text = data['age'] ?? '';
+        _painLocationController.text = data['painLocation'] ?? '';
+        _descriptionController.text = data['description'] ?? '';
+      });
+    } catch (e) {
+      debugPrint(e.toString());
     }
   }
 
@@ -44,25 +42,21 @@ class _PatientProfilePageState extends State<PatientProfilePage> {
     setState(() => _isLoading = true);
 
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-          'name': _nameController.text.trim(),
-          'age': _ageController.text.trim(),
-          'painLocation': _painLocationController.text.trim(),
-          'description': _descriptionController.text.trim(),
-        }, SetOptions(merge: true));
+      await _apiService.completePatientProfile(
+        age: _ageController.text.trim(),
+        painLocation: _painLocationController.text.trim(),
+        description: _descriptionController.text.trim(),
+      );
 
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('تم حفظ البيانات بنجاح')),
-          );
-        }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم حفظ البيانات بنجاح')),
+        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('حدث خطأ: $e')),
+          SnackBar(content: Text('حدث خطأ: ${e.toString().replaceAll('Exception: ', '')}')),
         );
       }
     } finally {
@@ -83,7 +77,8 @@ class _PatientProfilePageState extends State<PatientProfilePage> {
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(labelText: 'الاسم'),
-                validator: (v) => v!.isEmpty ? 'مطلوب' : null,
+                readOnly: true, // Name is set during registration
+                style: const TextStyle(color: Colors.grey),
               ),
               const SizedBox(height: 16),
               TextFormField(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../services/api_service.dart';
 import '../../core/config/routes/routes.dart';
 
 class LoginPage extends StatefulWidget {
@@ -24,60 +23,44 @@ class _LoginPageState extends State<LoginPage> {
       );
       return;
     }
-    try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('تم الإرسال'),
-            content: const Text(
-                'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني. يرجى التحقق منه.'),
-            actions: [
-              TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('حسناً')),
-            ],
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('حدث خطأ: $e')),
-        );
-      }
-    }
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('إعادة تعيين كلمة المرور'),
+        content: const Text(
+            'تم إرسال طلب إعادة تعيين كلمة المرور إلى بريدك الإلكتروني بنجاح (وضع ديمو).'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('حسناً')),
+        ],
+      ),
+    );
   }
 
   Future<void> _login() async {
     setState(() => _isLoading = true);
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+      final data = await ApiService().login(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
       );
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null && mounted) {
-        // التحقق من الدور المحفوظ
-        final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-        if (doc.exists && doc.data()!.containsKey('role')) {
-          final role = doc.data()!['role'];
-          if (role == 'patient') {
-            Navigator.pushReplacementNamed(context, AppRoutes.patientHome);
-          } else if (role == 'doctor') {
-            Navigator.pushReplacementNamed(context, AppRoutes.doctorHome);
-          } else {
-            Navigator.pushReplacementNamed(context, AppRoutes.role);
-          }
+      if (mounted) {
+        final role = data['user']['role'];
+        if (role == 'patient') {
+          Navigator.pushReplacementNamed(context, AppRoutes.patientHome);
+        } else if (role == 'doctor') {
+          Navigator.pushReplacementNamed(context, AppRoutes.doctorHome);
+        } else if (role == 'admin') {
+          Navigator.pushReplacementNamed(context, '/admin/dashboard');
         } else {
           Navigator.pushReplacementNamed(context, AppRoutes.role);
         }
       }
-    } on FirebaseAuthException catch (e) {
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message ?? 'حدث خطأ ما')),
+          SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
         );
       }
     } finally {

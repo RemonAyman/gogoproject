@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../../core/config/routes/routes.dart';
+import '../../services/api_service.dart';
 
 class PatientCompleteProfilePage extends StatefulWidget {
   const PatientCompleteProfilePage({super.key});
@@ -11,6 +10,7 @@ class PatientCompleteProfilePage extends StatefulWidget {
 }
 
 class _PatientCompleteProfilePageState extends State<PatientCompleteProfilePage> {
+  final ApiService _apiService = ApiService();
   final _formKey = GlobalKey<FormState>();
   final _ageController = TextEditingController();
   final _painLocationController = TextEditingController();
@@ -22,25 +22,19 @@ class _PatientCompleteProfilePageState extends State<PatientCompleteProfilePage>
     setState(() => _isLoading = true);
 
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        // Here we update the user doc which should already have role: 'patient'
-        // We add the extra details.
-        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-          'age': _ageController.text.trim(),
-          'painLocation': _painLocationController.text.trim(),
-          'description': _descriptionController.text.trim(),
-          'profileCompleted': true, // Flag to skip this page later
-        }, SetOptions(merge: true));
+      await _apiService.completePatientProfile(
+        age: _ageController.text.trim(),
+        painLocation: _painLocationController.text.trim(),
+        description: _descriptionController.text.trim(),
+      );
 
-        if (mounted) {
-          Navigator.pushReplacementNamed(context, AppRoutes.patientHome);
-        }
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, AppRoutes.patientHome);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('حدث خطأ: $e')),
+          SnackBar(content: Text('حدث خطأ: ${e.toString().replaceAll('Exception: ', '')}')),
         );
       }
     } finally {

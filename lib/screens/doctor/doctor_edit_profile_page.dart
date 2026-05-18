@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../../core/config/routes/routes.dart';
+import '../../services/api_service.dart';
 
 class DoctorEditProfilePage extends StatefulWidget {
   final bool isFirstTime;
@@ -12,6 +11,7 @@ class DoctorEditProfilePage extends StatefulWidget {
 }
 
 class _DoctorEditProfilePageState extends State<DoctorEditProfilePage> {
+  final ApiService _apiService = ApiService();
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _specialtyController = TextEditingController();
@@ -29,11 +29,9 @@ class _DoctorEditProfilePageState extends State<DoctorEditProfilePage> {
   }
 
   Future<void> _loadUserData() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-      if (doc.exists) {
-        final data = doc.data() as Map<String, dynamic>;
+    try {
+      final data = await _apiService.getMe();
+      setState(() {
         _nameController.text = data['name'] ?? '';
         _specialtyController.text = data['specialty'] ?? '';
         _priceController.text = data['price'] ?? '';
@@ -41,9 +39,11 @@ class _DoctorEditProfilePageState extends State<DoctorEditProfilePage> {
         _governorateController.text = data['governorate'] ?? '';
         _addressController.text = data['address'] ?? '';
         if (data['workplaceType'] != null) {
-          setState(() => _workplaceType = data['workplaceType']);
+          _workplaceType = data['workplaceType'];
         }
-      }
+      });
+    } catch (e) {
+      debugPrint(e.toString());
     }
   }
 
@@ -52,34 +52,30 @@ class _DoctorEditProfilePageState extends State<DoctorEditProfilePage> {
     setState(() => _isLoading = true);
 
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-          'name': _nameController.text.trim(),
-          'specialty': _specialtyController.text.trim(),
-          'price': _priceController.text.trim(),
-          'bio': _bioController.text.trim(),
-          'governorate': _governorateController.text.trim(),
-          'address': _addressController.text.trim(),
-          'workplaceType': _workplaceType,
-          'profileCompleted': true,
-        }, SetOptions(merge: true));
+      await _apiService.completeDoctorProfile(
+        name: _nameController.text.trim(),
+        specialty: _specialtyController.text.trim(),
+        price: _priceController.text.trim(),
+        bio: _bioController.text.trim(),
+        workplaceType: _workplaceType,
+        governorate: _governorateController.text.trim(),
+        address: _addressController.text.trim(),
+      );
 
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('تم حفظ البيانات بنجاح')),
-          );
-          if (widget.isFirstTime) {
-            Navigator.pushReplacementNamed(context, AppRoutes.doctorHome);
-          } else {
-            Navigator.pop(context);
-          }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم حفظ البيانات بنجاح')),
+        );
+        if (widget.isFirstTime) {
+          Navigator.pushReplacementNamed(context, AppRoutes.doctorHome);
+        } else {
+          Navigator.pop(context);
         }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('حدث خطأ: $e')),
+          SnackBar(content: Text('حدث خطأ: ${e.toString().replaceAll('Exception: ', '')}')),
         );
       }
     } finally {

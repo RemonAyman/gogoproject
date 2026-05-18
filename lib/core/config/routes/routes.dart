@@ -10,6 +10,8 @@ import '../../../screens/patient/appointment_booking_page.dart';
 import '../../../screens/patient/my_appointments_page.dart';
 import '../../../screens/settings/settings_page.dart';
 import '../../../screens/patient/patient_profile_page.dart';
+import '../../../screens/patient/specialties_grid_page.dart';
+import '../../../screens/admin/admin_dashboard_page.dart';
 
 class AppRoutes {
   static const login = '/login';
@@ -28,7 +30,9 @@ class AppRoutes {
     login: (_) => const LoginPage(),
     signup: (_) => const SignUpPage(),
     role: (_) => const RoleSelectionPage(),
-    patientHome: (_) => const DoctorListPage(),
+    patientHome: (_) => const SpecialtiesGridPage(),
+    '/patient/doctors_list': (_) => const DoctorListPage(),
+    '/admin/dashboard': (_) => const AdminDashboardPage(),
     doctorHome: (_) => const DashboardPage(),
     doctorAppointments: (ctx) {
       final args = ModalRoute.of(ctx)!.settings.arguments;

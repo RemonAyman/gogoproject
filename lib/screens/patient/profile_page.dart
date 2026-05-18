@@ -1,30 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../services/api_service.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      return const Scaffold(body: Center(child: Text('غير مسجل الدخول')));
-    }
+    final apiService = ApiService();
 
     return Scaffold(
       appBar: AppBar(title: const Text('ملفي الشخصي')),
-      body: FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance.collection('users').doc(user.uid).get(),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: apiService.getMe(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
+          if (snapshot.hasError) {
+            return Center(child: Text('حدث خطأ: ${snapshot.error}'));
+          }
 
-          final data = snapshot.data?.data() as Map<String, dynamic>?;
+          final data = snapshot.data;
           final name = data?['name'] ?? 'مستخدم';
-          final email = user.email ?? 'لا يوجد بريد';
+          final email = data?['email'] ?? 'لا يوجد بريد';
 
           return Padding(
             padding: const EdgeInsets.all(18.0),
@@ -47,7 +45,7 @@ class ProfilePage extends StatelessWidget {
                 const SizedBox(height: 8),
                 const Align(
                   alignment: Alignment.centerRight,
-                  child: Text('تم تسجيل الدخول باستخدام Firebase.'),
+                  child: Text('تم تسجيل الدخول باستخدام النظام الموحد MongoDB.'),
                 ),
               ],
             ),
