@@ -112,7 +112,7 @@ class _DoctorEditProfilePageState extends State<DoctorEditProfilePage> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _workplaceType,
+                initialValue: _workplaceType,
                 decoration: const InputDecoration(labelText: 'مكان العمل'),
                 items: ['عيادة', 'مستشفى'].map((String value) {
                   return DropdownMenuItem<String>(

@@ -356,7 +356,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> with SingleTick
 
                     // Specialty Dropdown
                     DropdownButtonFormField<String>(
-                      value: _selectedSpecialty,
+                      initialValue: _selectedSpecialty,
                       decoration: const InputDecoration(
                         labelText: 'اختر تخصص الطبيب',
                         prefixIcon: Icon(Icons.category),
